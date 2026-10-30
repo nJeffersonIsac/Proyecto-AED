@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Filete</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="Facturacion.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -12,8 +12,7 @@
     <div class="app-container">
         <!-- Sidebar / Navigation -->
         <nav class="sidebar">
-           <div class="logo-container" style="justify-content: center; padding-bottom: 10px;">
-
+            <div class="logo-container" style="justify-content: center; padding-bottom: 10px;">
                 <img src="Imagenes/Logo.jpg" alt="Logo El Filete" class="sidebar-logo">
             </div>
             <ul class="nav-links">
@@ -32,12 +31,16 @@
                     <span class="user-name">Cajero Principal</span>
                     <span class="time-display" id="clock">12:00:00</span>
                 </div>
+                <button class="btn-tema" id="btn-tema" onclick="toggleTema()" title="Cambiar tema">
+                    <i class="fa-solid fa-moon" id="icono-tema"></i>
+                    <span id="texto-tema">Oscuro</span>
+                </button>
             </div>
         </nav>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            
+
             <!-- POS View -->
             <section id="pos-view" class="view-section active-view">
                 <div class="catalog-section">
@@ -48,28 +51,23 @@
                             <input type="text" id="search-input" placeholder="Buscar productos...">
                         </div>
                     </header>
-                    
+
                     <div class="categories-wrapper">
                         <button class="scroll-btn left"><i class="fa-solid fa-chevron-left"></i></button>
-                        <div class="categories-container" id="categories-container">
-                            <!-- Categories generated dynamically -->
-                        </div>
+                        <div class="categories-container" id="categories-container"></div>
                         <button class="scroll-btn right"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
 
-                    <div class="products-grid" id="products-grid">
-                        <!-- Products generated dynamically -->
-                    </div>
+                    <div class="products-grid" id="products-grid"></div>
                 </div>
 
-                <!-- Order Panel (Right Side) -->
+                <!-- Order Panel -->
                 <aside class="order-panel">
                     <div class="order-header">
                         <h3>Orden Actual</h3>
                         <button class="btn-clear" id="btn-clear-order"><i class="fa-solid fa-trash-can"></i> Limpiar</button>
                     </div>
 
-                    <!-- Configuración de Mesa y Cliente -->
                     <div class="order-config">
                         <div class="order-config-row">
                             <label for="order-mesa-select"><i class="fa-solid fa-chair"></i> Mesa:</label>
@@ -82,9 +80,8 @@
                             <input type="text" id="order-cliente-input" class="order-input" placeholder="Consumidor Final">
                         </div>
                     </div>
-                    
+
                     <div class="order-items" id="order-items">
-                        <!-- Order items go here -->
                         <div class="empty-order-msg">
                             <i class="fa-solid fa-cart-arrow-down"></i>
                             <p>No hay productos en la orden</p>
@@ -104,13 +101,16 @@
                             <span>Total</span>
                             <span id="summary-total">C$ 0.00</span>
                         </div>
-                        
+
                         <div class="payment-methods">
                             <label class="payment-method selected">
                                 <input type="radio" name="payment" value="Efectivo" checked>
                                 <i class="fa-solid fa-money-bill-wave"></i> Efectivo
                             </label>
-
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="Tarjeta">
+                                <i class="fa-solid fa-credit-card"></i> Tarjeta
+                            </label>
                             <label class="payment-method">
                                 <input type="radio" name="payment" value="Transferencia">
                                 <i class="fa-solid fa-mobile-screen"></i> Transf.
@@ -124,10 +124,10 @@
                 </aside>
             </section>
 
-           <!-- Facturas View -->
+            <!-- Facturas View -->
             <section id="inventory-view" class="view-section">
                 <header class="view-header">
-                    <h2>Facturas Registradas</h2>
+                    <h2>Historial de Facturas (Base de Datos)</h2>
                     <button class="btn-primary" onclick="cargarFacturas()"><i class="fa-solid fa-rotate-right"></i> Actualizar</button>
                 </header>
                 <div class="table-container">
@@ -136,16 +136,14 @@
                             <tr>
                                 <th>N° Factura</th>
                                 <th>Fecha y Hora</th>
-                                <th>Tipo</th>
+                                <th>Mesa / Tipo</th>
                                 <th>Cliente</th>
                                 <th>Método</th>
                                 <th>Total Pagado</th>
                                 <th>Acción</th>
                             </tr>
                         </thead>
-                        <tbody id="facturas-table-body">
-                            <!-- Se llenará automáticamente desde la API -->
-                        </tbody>
+                        <tbody id="facturas-table-body"></tbody>
                     </table>
                 </div>
             </section>
@@ -153,21 +151,19 @@
     </div>
 
     <!-- Invoice Modal -->
-     <!-- Espacio de Facturacion impresa-->>
     <div class="modal-overlay" id="invoice-modal">
         <div class="modal-content invoice-card">
             <button class="close-modal" id="close-invoice"><i class="fa-solid fa-xmark"></i></button>
-            <div class="invoice-header">
-                <i class="fa-solid fa-utensils invoice-logo"></i>
-                <h2>El Filete</h2>
-                <p>Bar y Restaurante</p>
-                <!--Podria ser agregar la direccion-->
-                <p class="invoice-meta">Fecha: <span id="inv-date"></span> | Hora: <span id="inv-time"></span></p>
-                <p class="invoice-meta">Cliente: <strong id="inv-cliente">Consumidor Final</strong> | <span id="inv-mesa">Para Llevar</span></p>
-                <p class="invoice-meta">Factura N°: <span id="inv-number" class="highlight">000001</span></p>
-            </div>
-            
-            <div class="invoice-body">
+<div class="invoice-header">
+    <div class="invoice-logo-img">
+        <img src="Imagenes/Logo.jpg" alt="Logo El Filete">
+    </div>
+    <h2>Restaurante "El Filete"</h2>
+    <p>Factura de Venta</p>
+    <p class="invoice-meta">Fecha: <span id="inv-date"></span> | Hora: <span id="inv-time"></span></p>
+    <p class="invoice-meta">Cliente: <strong id="inv-cliente">Consumidor Final</strong> | <span id="inv-mesa">Para Llevar</span></p>
+    <p class="invoice-meta">Comprobante N°: <span id="inv-number" class="highlight">000001</span></p>
+</div>            <div class="invoice-body">
                 <table class="invoice-table">
                     <thead>
                         <tr>
@@ -177,12 +173,10 @@
                             <th>Total</th>
                         </tr>
                     </thead>
-                    <tbody id="inv-items">
-                        <!-- Items -->
-                    </tbody>
+                    <tbody id="inv-items"></tbody>
                 </table>
             </div>
-            
+
             <div class="invoice-footer">
                 <div class="inv-summary">
                     <div class="inv-row"><span>Subtotal:</span><span id="inv-subtotal"></span></div>
@@ -204,6 +198,44 @@
     <!-- Notification Toast -->
     <div id="toast-container" class="toast-container"></div>
 
+    <script>
+        /* ====== GESTIÓN DE TEMA ====== */
+        function aplicarTema(tema) {
+            document.documentElement.setAttribute('data-theme', tema);
+            const icono = document.getElementById('icono-tema');
+            const texto = document.getElementById('texto-tema');
+            if (icono) {
+                icono.className = tema === 'light' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            }
+            if (texto) {
+                texto.textContent = tema === 'light' ? 'Claro' : 'Oscuro';
+            }
+            localStorage.setItem('filete-tema', tema);
+        }
+
+        function toggleTema() {
+            const actual = document.documentElement.getAttribute('data-theme');
+            aplicarTema(actual === 'dark' ? 'light' : 'dark');
+        }
+
+        (function initTema() {
+            const guardado = localStorage.getItem('filete-tema');
+            if (guardado) {
+                aplicarTema(guardado);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                aplicarTema('light');
+            } else {
+                aplicarTema('dark');
+            }
+        })();
+
+        // Sincronizar tema entre pestañas/iframes
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'filete-tema' && e.newValue) {
+                aplicarTema(e.newValue);
+            }
+        });
+    </script>
     <script src="app.js"></script>
 </body>
 </html>

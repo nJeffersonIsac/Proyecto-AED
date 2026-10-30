@@ -39,7 +39,7 @@
         }
 
         .logo-container img {
-            height: 50px;
+            height: 48px;
             width: auto;
             border-radius: 8px;
             display: block;
@@ -62,7 +62,7 @@
         .nav-links a {
             color: #dca742; 
             text-decoration: none;
-            font-size: 1.0 rem;
+            font-size: 0.85rem;
             font-weight: 600;
             letter-spacing: 1.5px;
             text-transform: uppercase;
@@ -91,14 +91,17 @@
 <body>
 
     <nav class="top-nav">
-        
+        <div class="logo-container">
+            <img src="Imagenes/Logo.jpg" alt="Logo El Filete">
+            <span class="brand-name">EL FILETE</span>
+        </div>
 
         <div class="nav-links">
             <a href="MenuFilete.html" target="main-frame" class="active" onclick="setActive(this)">
                 <i class="fa-solid fa-book-open"></i> Menú
             </a>
             <a href="Facturacion.html" target="main-frame" onclick="setActive(this)">
-                <i class="fa-solid fa-cash-register"></i> Facturación
+                <i class="fa-solid fa-cash-register"></i> Facturación POS
             </a>
         </div>
     </nav>

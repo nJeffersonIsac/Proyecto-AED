@@ -1,149 +1,23 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú del Restaurante - El Filete</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --color-fondo: #0b0f19;
-            --color-texto-principal: #f8fafc;
-            --color-texto-secundario: #94a3b8;
-            --color-acento: #3b82f6;
-            --color-tarjeta-fondo: rgba(30, 41, 59, 0.6);
-            --sombra-tarjeta: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-            --sombra-tarjeta-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-            --radio-borde: 12px;
-            --fuente-principal: 'Inter', system-ui, sans-serif;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--fuente-principal);
-            background-color: var(--color-fondo);
-            color: var(--color-texto-principal);
-            line-height: 1.5;
-        }
-        .contenedor {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem 4rem 1rem;
-        }
-        .cabecera-menu {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 3px solid var(--color-acento);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-        .logo-box {
-            width: 100%;
-            max-width: 140px;
-            background-color: white;
-            border-radius: 12px;
-            padding: 8px;
-        }
-        .logo-box img { width: 100%; height: auto; display: block; border-radius: 6px; }
-        .cabecera-menu h1 {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: var(--color-texto-principal);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .subtitulo-menu {
-            font-size: 1.4rem;
-            color: var(--color-texto-secundario);
-            color: #f8fafc;
-            font-weight: 400;
-        }
-        .seccion-categoria { margin-bottom: 3.5rem; }
-        .titulo-categoria {
-            font-size: 1.8rem;
-            color: var(--color-acento);
-            margin-bottom: 1.5rem;
-            padding-left: 1rem;
-            border-left: 5px solid var(--color-acento);
-        }
-        .cuadricula {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-            gap: 1.8rem;
-        }
-        .tarjeta-producto {
-            background-color: var(--color-tarjeta-fondo);
-            border-radius: var(--radio-borde);
-            overflow: hidden;
-            box-shadow: var(--sombra-tarjeta);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .tarjeta-producto:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--sombra-tarjeta-hover);
-        }
-        .imagen-wrapper {
-            width: 100%;
-            height: 190px;
-            overflow: hidden;
-            background-color: rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .imagen-producto {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        .tarjeta-producto:hover .imagen-producto { transform: scale(1.05); }
-        .contenido-tarjeta {
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-        .nombre-producto {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 0.4rem;
-            color: var(--color-texto-principal);
-        }
-        .descripcion-producto {
-            font-size: 0.9rem;
-            color: var(--color-texto-secundario);
-            margin-bottom: 1.25rem;
-            flex-grow: 1;
-            line-height: 1.4;
-        }
-        .precio {
-            display: inline-block;
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--color-acento);
-            margin-top: auto;
-        }
-        .loading-state {
-            text-align: center;
-            padding: 4rem;
-            color: var(--color-texto-secundario);
-            font-size: 1.2rem;
-        }
-    </style>
+    <link rel="stylesheet" href="menu.css">
 </head>
 <body>
+    <button class="btn-tema" id="btn-tema" onclick="toggleTema()" title="Cambiar tema">
+        <i class="fa-solid fa-moon" id="icono-tema"></i>
+        <span id="texto-tema">Oscuro</span>
+    </button>
+
     <div class="contenedor">
         <header class="cabecera-menu">
             <div class="logo-box">
-                <img src="Imagenes/Logo.jpg" alt="Logo El Filete" decoding="async">
+                <img src="Imagenes/Logo.jpg" alt="Logo El Filete">
             </div>
             <h1>Menú Digital</h1>
             <h2 class="subtitulo-menu">Descubre nuestros deliciosos platillos y especialidades</h2>
@@ -159,6 +33,50 @@
     <script>
         const API_BASE = (window.location.protocol === 'file:') ? 'http://localhost:5000' : '';
 
+        /* ====== GESTIÓN DE TEMA ====== */
+        function aplicarTema(tema) {
+            document.documentElement.setAttribute('data-theme', tema);
+            const icono = document.getElementById('icono-tema');
+            const texto = document.getElementById('texto-tema');
+            if (tema === 'light') {
+                icono.className = 'fa-solid fa-sun';
+                texto.textContent = 'Claro';
+            } else {
+                icono.className = 'fa-solid fa-moon';
+                texto.textContent = 'Oscuro';
+            }
+            localStorage.setItem('filete-tema', tema);
+        }
+
+        function toggleTema() {
+            const actual = document.documentElement.getAttribute('data-theme');
+            aplicarTema(actual === 'dark' ? 'light' : 'dark');
+        }
+
+        (function initTema() {
+            const guardado = localStorage.getItem('filete-tema');
+            if (guardado) {
+                aplicarTema(guardado);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                aplicarTema('light');
+            } else {
+                aplicarTema('dark');
+            }
+        })();
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'filete-tema' && e.newValue) {
+                aplicarTema(e.newValue);
+            }
+        });
+
+        /* ====== ACORDEÓN ====== */
+        function toggleCategoria(elementoTitulo) {
+            const seccion = elementoTitulo.closest('.seccion-categoria');
+            seccion.classList.toggle('abierta');
+        }
+
+        /* ====== CARGA DEL MENÚ ====== */
         async function cargarMenu() {
             const container = document.getElementById('menu-contenedor');
             try {
@@ -166,7 +84,6 @@
                 if (!res.ok) throw new Error("Error al consultar productos (HTTP " + res.status + ")");
                 const productos = await res.json();
 
-                // Agrupar productos por categoría preservando orden
                 const categoriasMap = new Map();
                 productos.forEach(p => {
                     if (!categoriasMap.has(p.categoria)) {
@@ -176,23 +93,39 @@
                 });
 
                 let html = '';
+                let primeraCategoria = true;
+
                 categoriasMap.forEach((items, categoria) => {
+                    const abierta = primeraCategoria ? 'abierta' : '';
+                    primeraCategoria = false;
+
                     html += `
-                    <section class="seccion-categoria">
-                        <h2 class="titulo-categoria">${categoria}</h2>
-                        <div class="cuadricula">
-                            ${items.map(p => `
-                                <article class="tarjeta-producto">
-                                    <div class="imagen-wrapper">
-                                        ${p.imagen_url ? `<img src="${p.imagen_url}" alt="${p.nombre}" class="imagen-producto" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-utensils\\' style=\\'font-size:3rem;color:rgba(255,255,255,0.15)\\'></i>'">` : `<i class="fa-solid fa-utensils" style="font-size:3rem;color:rgba(255,255,255,0.15)"></i>`}
-                                    </div>
-                                    <div class="contenido-tarjeta">
-                                        <h3 class="nombre-producto">${p.nombre}</h3>
-                                        <p class="descripcion-producto">${p.descripcion || ''}</p>
-                                        <span class="precio">C$ ${p.precio.toFixed(2)}</span>
-                                    </div>
-                                </article>
-                            `).join('')}
+                    <section class="seccion-categoria ${abierta}">
+                        <h2 class="titulo-categoria" onclick="toggleCategoria(this)">
+                            <span class="titulo-izq">
+                                <i class="fa-solid fa-utensils"></i>
+                                ${categoria}
+                                <span class="badge-contador">${items.length}</span>
+                            </span>
+                            <i class="fa-solid fa-chevron-down chevron"></i>
+                        </h2>
+                        <div class="contenido-categoria">
+                            <div class="cuadricula">
+                                ${items.map(p => `
+                                    <article class="tarjeta-producto">
+                                        <div class="imagen-wrapper">
+                                            ${p.imagen_url
+                                                ? `<img src="${p.imagen_url}" alt="${p.nombre}" class="imagen-producto" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-utensils icono-placeholder\\'></i>'">`
+                                                : `<i class="fa-solid fa-utensils icono-placeholder"></i>`}
+                                        </div>
+                                        <div class="contenido-tarjeta">
+                                            <h3 class="nombre-producto">${p.nombre}</h3>
+                                            <p class="descripcion-producto">${p.descripcion || ''}</p>
+                                            <span class="precio">C$ ${p.precio.toFixed(2)}</span>
+                                        </div>
+                                    </article>
+                                `).join('')}
+                            </div>
                         </div>
                     </section>
                     `;
@@ -204,6 +137,7 @@
                 container.innerHTML = `<div class="loading-state" style="color:#ef4444;">Error al cargar el menú desde el servidor.</div>`;
             }
         }
+
         document.addEventListener('DOMContentLoaded', cargarMenu);
     </script>
 </body>
