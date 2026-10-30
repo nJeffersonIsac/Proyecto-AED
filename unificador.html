@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante El Filete</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #0b0f19;
+            overflow: hidden;
+        }
+
+        /* Diseño de la barra de navegación */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 2rem;
+            background-color: rgba(11, 15, 25, 0.95);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-container img {
+            height: 50px;
+            width: auto;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .brand-name {
+            color: #f8fafc;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        /* Contenedor central de enlaces */
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #dca742; 
+            text-decoration: none;
+            font-size: 1.0 rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #ffffff;
+            background-color: rgba(220, 167, 66, 0.15);
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            padding-top: 65px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        
+
+        <div class="nav-links">
+            <a href="MenuFilete.html" target="main-frame" class="active" onclick="setActive(this)">
+                <i class="fa-solid fa-book-open"></i> Menú
+            </a>
+            <a href="Facturacion.html" target="main-frame" onclick="setActive(this)">
+                <i class="fa-solid fa-cash-register"></i> Facturación
+            </a>
+        </div>
+    </nav>
+
+    <!-- El iframe principal -->
+    <iframe name="main-frame" src="MenuFilete.html" class="content-frame"></iframe>
+
+    <script>
+        function setActive(element) {
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>

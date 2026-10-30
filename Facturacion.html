@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Filete</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Navigation -->
+        <nav class="sidebar">
+           <div class="logo-container" style="justify-content: center; padding-bottom: 10px;">
+
+                <img src="Imagenes/Logo.jpg" alt="Logo El Filete" class="sidebar-logo">
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active" data-tab="pos">
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span>Punto de Venta</span>
+                </li>
+                <li class="nav-item" data-tab="inventory">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Historial Facturas</span>
+                </li>
+            </ul>
+            <div class="user-info">
+                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="user-details">
+                    <span class="user-name">Cajero Principal</span>
+                    <span class="time-display" id="clock">12:00:00</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- POS View -->
+            <section id="pos-view" class="view-section active-view">
+                <div class="catalog-section">
+                    <header class="catalog-header">
+                        <h2>Menú</h2>
+                        <div class="search-bar">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Buscar productos...">
+                        </div>
+                    </header>
+                    
+                    <div class="categories-wrapper">
+                        <button class="scroll-btn left"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div class="categories-container" id="categories-container">
+                            <!-- Categories generated dynamically -->
+                        </div>
+                        <button class="scroll-btn right"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+
+                    <div class="products-grid" id="products-grid">
+                        <!-- Products generated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Order Panel (Right Side) -->
+                <aside class="order-panel">
+                    <div class="order-header">
+                        <h3>Orden Actual</h3>
+                        <button class="btn-clear" id="btn-clear-order"><i class="fa-solid fa-trash-can"></i> Limpiar</button>
+                    </div>
+
+                    <!-- Configuración de Mesa y Cliente -->
+                    <div class="order-config">
+                        <div class="order-config-row">
+                            <label for="order-mesa-select"><i class="fa-solid fa-chair"></i> Mesa:</label>
+                            <select id="order-mesa-select" class="order-select">
+                                <option value="">Para Llevar / Caja</option>
+                            </select>
+                        </div>
+                        <div class="order-config-row">
+                            <label for="order-cliente-input"><i class="fa-solid fa-user"></i> Cliente:</label>
+                            <input type="text" id="order-cliente-input" class="order-input" placeholder="Consumidor Final">
+                        </div>
+                    </div>
+                    
+                    <div class="order-items" id="order-items">
+                        <!-- Order items go here -->
+                        <div class="empty-order-msg">
+                            <i class="fa-solid fa-cart-arrow-down"></i>
+                            <p>No hay productos en la orden</p>
+                        </div>
+                    </div>
+
+                    <div class="order-summary">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="summary-subtotal">C$ 0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>IVA (15%)</span>
+                            <span id="summary-tax">C$ 0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span id="summary-total">C$ 0.00</span>
+                        </div>
+                        
+                        <div class="payment-methods">
+                            <label class="payment-method selected">
+                                <input type="radio" name="payment" value="Efectivo" checked>
+                                <i class="fa-solid fa-money-bill-wave"></i> Efectivo
+                            </label>
+
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="Transferencia">
+                                <i class="fa-solid fa-mobile-screen"></i> Transf.
+                            </label>
+                        </div>
+
+                        <button class="btn-process" id="btn-process-order" disabled>
+                            Cobrar <span id="btn-total">C$ 0.00</span>
+                        </button>
+                    </div>
+                </aside>
+            </section>
+
+           <!-- Facturas View -->
+            <section id="inventory-view" class="view-section">
+                <header class="view-header">
+                    <h2>Facturas Registradas</h2>
+                    <button class="btn-primary" onclick="cargarFacturas()"><i class="fa-solid fa-rotate-right"></i> Actualizar</button>
+                </header>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>N° Factura</th>
+                                <th>Fecha y Hora</th>
+                                <th>Tipo</th>
+                                <th>Cliente</th>
+                                <th>Método</th>
+                                <th>Total Pagado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="facturas-table-body">
+                            <!-- Se llenará automáticamente desde la API -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Invoice Modal -->
+     <!-- Espacio de Facturacion impresa-->>
+    <div class="modal-overlay" id="invoice-modal">
+        <div class="modal-content invoice-card">
+            <button class="close-modal" id="close-invoice"><i class="fa-solid fa-xmark"></i></button>
+            <div class="invoice-header">
+                <i class="fa-solid fa-utensils invoice-logo"></i>
+                <h2>El Filete</h2>
+                <p>Bar y Restaurante</p>
+                <!--Podria ser agregar la direccion-->
+                <p class="invoice-meta">Fecha: <span id="inv-date"></span> | Hora: <span id="inv-time"></span></p>
+                <p class="invoice-meta">Cliente: <strong id="inv-cliente">Consumidor Final</strong> | <span id="inv-mesa">Para Llevar</span></p>
+                <p class="invoice-meta">Factura N°: <span id="inv-number" class="highlight">000001</span></p>
+            </div>
+            
+            <div class="invoice-body">
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Cant.</th>
+                            <th>Descripción</th>
+                            <th>P. Unit</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inv-items">
+                        <!-- Items -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="invoice-footer">
+                <div class="inv-summary">
+                    <div class="inv-row"><span>Subtotal:</span><span id="inv-subtotal"></span></div>
+                    <div class="inv-row"><span>IVA (15%):</span><span id="inv-tax"></span></div>
+                    <div class="inv-row inv-total"><span>Total pagado:</span><span id="inv-total"></span></div>
+                </div>
+                <div class="inv-payment-info">
+                    <p>Método de pago: <span id="inv-payment-method" class="highlight-badge">Efectivo</span></p>
+                </div>
+                <p class="thank-you">¡Gracias por su preferencia!</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btn-print"><i class="fa-solid fa-print"></i> Imprimir</button>
+                <button class="btn-primary" id="btn-done"><i class="fa-solid fa-check"></i> Finalizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+#Base de datos SQLite
+Filete2.db
+*.db
+*.SQLite
+*.sqlite3
+
+#Configuracion local
+.vscode/
+
+#Archivos cache
+__pycache__/
+*.py[cod]
