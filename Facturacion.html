@@ -2,191 +2,119 @@
 <html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Filete</title>
+    <title>POS - El Filete</title>
     <link rel="stylesheet" href="Facturacion.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        (function initTema() {
+            const guardado = localStorage.getItem('filete-tema');
+            if (guardado) document.documentElement.setAttribute('data-theme', guardado);
+        })();
+    </script>
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar / Navigation -->
         <nav class="sidebar">
-            <div class="logo-container" style="justify-content: center; padding-bottom: 10px;">
-                <img src="Imagenes/Logo.jpg" alt="Logo El Filete" class="sidebar-logo">
-            </div>
+            <div class="logo-container"><img src="Imagenes/Logo.jpg" alt="Logo"></div>
             <ul class="nav-links">
-                <li class="nav-item active" data-tab="pos">
-                    <i class="fa-solid fa-cash-register"></i>
-                    <span>Punto de Venta</span>
-                </li>
-                <li class="nav-item" data-tab="inventory">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                    <span>Historial Facturas</span>
-                </li>
+                <li class="nav-item active" data-tab="pos"><i class="fa-solid fa-cash-register"></i> <span>Punto de Venta</span></li>
+                <li class="nav-item" data-tab="inventory"><i class="fa-solid fa-file-invoice-dollar"></i> <span>Historial Facturas</span></li>
+                <li class="nav-item" data-tab="reportes" data-rol-requerido="admin"><i class="fa-solid fa-chart-line"></i> <span>Reportes</span></li>
+                <li class="nav-item" data-tab="usuarios" data-rol-requerido="admin,mesero"><i class="fa-solid fa-users-gear"></i> <span>Usuarios</span></li>
             </ul>
             <div class="user-info">
                 <div class="avatar"><i class="fa-solid fa-user"></i></div>
                 <div class="user-details">
-                    <span class="user-name">Cajero Principal</span>
-                    <span class="time-display" id="clock">12:00:00</span>
+                    <span class="user-name" id="sidebar-nombre-usuario">...</span>
+                    <span class="badge" id="sidebar-rol"></span>
                 </div>
-                <button class="btn-tema" id="btn-tema" onclick="toggleTema()" title="Cambiar tema">
+                <button class="btn-tema" onclick="toggleTema()" title="Cambiar tema" style="padding: 8px 12px;">
                     <i class="fa-solid fa-moon" id="icono-tema"></i>
-                    <span id="texto-tema">Oscuro</span>
+                </button>
+                <button class="btn-tema" onclick="cerrarSesion()" title="Cerrar Sesión" style="border-color: var(--danger); color: var(--danger); padding: 8px 12px;">
+                    <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
         </nav>
 
-        <!-- Main Content Area -->
         <main class="main-content">
-
-            <!-- POS View -->
             <section id="pos-view" class="view-section active-view">
                 <div class="catalog-section">
                     <header class="catalog-header">
                         <h2>Menú</h2>
-                        <div class="search-bar">
-                            <i class="fa-solid fa-search"></i>
-                            <input type="text" id="search-input" placeholder="Buscar productos...">
-                        </div>
+                        <div class="search-bar"><input type="text" id="search-input" placeholder="Buscar productos..."></div>
                     </header>
-
-                    <div class="categories-wrapper">
-                        <button class="scroll-btn left"><i class="fa-solid fa-chevron-left"></i></button>
-                        <div class="categories-container" id="categories-container"></div>
-                        <button class="scroll-btn right"><i class="fa-solid fa-chevron-right"></i></button>
-                    </div>
-
+                    <div class="categories-wrapper"><div class="categories-container" id="categories-container"></div></div>
                     <div class="products-grid" id="products-grid"></div>
                 </div>
-
-                <!-- Order Panel -->
                 <aside class="order-panel">
-                    <div class="order-header">
-                        <h3>Orden Actual</h3>
-                        <button class="btn-clear" id="btn-clear-order"><i class="fa-solid fa-trash-can"></i> Limpiar</button>
-                    </div>
-
+                    <div class="order-header"><h3>Orden Actual</h3><button class="btn-clear" id="btn-clear-order">Limpiar</button></div>
                     <div class="order-config">
-                        <div class="order-config-row">
-                            <label for="order-mesa-select"><i class="fa-solid fa-chair"></i> Mesa:</label>
-                            <select id="order-mesa-select" class="order-select">
-                                <option value="">Para Llevar / Caja</option>
-                            </select>
-                        </div>
-                        <div class="order-config-row">
-                            <label for="order-cliente-input"><i class="fa-solid fa-user"></i> Cliente:</label>
-                            <input type="text" id="order-cliente-input" class="order-input" placeholder="Consumidor Final">
-                        </div>
+                        <div class="order-config-row"><label>Mesa:</label><select id="order-mesa-select" class="order-select"><option value="">Para Llevar</option></select></div>
+                        <div class="order-config-row"><label>Cliente:</label><input type="text" id="order-cliente-input" class="order-input" placeholder="Consumidor Final"></div>
                     </div>
-
-                    <div class="order-items" id="order-items">
-                        <div class="empty-order-msg">
-                            <i class="fa-solid fa-cart-arrow-down"></i>
-                            <p>No hay productos en la orden</p>
-                        </div>
-                    </div>
-
+                    <div class="order-items" id="order-items"></div>
                     <div class="order-summary">
-                        <div class="summary-row">
-                            <span>Subtotal</span>
-                            <span id="summary-subtotal">C$ 0.00</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>IVA (15%)</span>
-                            <span id="summary-tax">C$ 0.00</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Total</span>
-                            <span id="summary-total">C$ 0.00</span>
-                        </div>
-
+                        <div class="summary-row"><span>Subtotal</span><span id="summary-subtotal">C$ 0.00</span></div>
+                        <div class="summary-row"><span>IVA (15%)</span><span id="summary-tax">C$ 0.00</span></div>
+                        <div class="summary-row total"><span>Total</span><span id="summary-total">C$ 0.00</span></div>
                         <div class="payment-methods">
-                            <label class="payment-method selected">
-                                <input type="radio" name="payment" value="Efectivo" checked>
-                                <i class="fa-solid fa-money-bill-wave"></i> Efectivo
-                            </label>
-                            <label class="payment-method">
-                                <input type="radio" name="payment" value="Tarjeta">
-                                <i class="fa-solid fa-credit-card"></i> Tarjeta
-                            </label>
-                            <label class="payment-method">
-                                <input type="radio" name="payment" value="Transferencia">
-                                <i class="fa-solid fa-mobile-screen"></i> Transf.
-                            </label>
+                            <label class="payment-method selected"><input type="radio" name="payment" value="Efectivo" checked><i class="fa-solid fa-money-bill-wave"></i> Efectivo</label>
+                            <label class="payment-method"><input type="radio" name="payment" value="Tarjeta"><i class="fa-solid fa-credit-card"></i> Tarjeta</label>
+                            <label class="payment-method"><input type="radio" name="payment" value="Transferencia"><i class="fa-solid fa-mobile-screen"></i> Transf.</label>
                         </div>
-
-                        <button class="btn-process" id="btn-process-order" disabled>
-                            Cobrar <span id="btn-total">C$ 0.00</span>
-                        </button>
+                        <button class="btn-process" id="btn-process-order" disabled>Cobrar <span id="btn-total">C$ 0.00</span></button>
                     </div>
                 </aside>
             </section>
 
-            <!-- Facturas View -->
             <section id="inventory-view" class="view-section">
-                <header class="view-header">
-                    <h2>Historial de Facturas (Base de Datos)</h2>
-                    <button class="btn-primary" onclick="cargarFacturas()"><i class="fa-solid fa-rotate-right"></i> Actualizar</button>
-                </header>
+                <header class="view-header"><h2>Historial de Facturas</h2><button class="btn-primary" onclick="cargarFacturas()">Actualizar</button></header>
                 <div class="table-container">
                     <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>N° Factura</th>
-                                <th>Fecha y Hora</th>
-                                <th>Mesa / Tipo</th>
-                                <th>Cliente</th>
-                                <th>Método</th>
-                                <th>Total Pagado</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>N°</th><th>Fecha</th><th>Mesa/Tipo</th><th>Cliente</th><th>Método</th><th>Total</th><th>Acciones</th></tr></thead>
                         <tbody id="facturas-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="reportes-view" class="view-section">
+                <header class="view-header"><h2>Reportes</h2></header>
+                <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                    <p>El módulo de reportes está disponible. (Función en desarrollo visual).</p>
+                </div>
+            </section>
+
+            <section id="usuarios-view" class="view-section">
+                <header class="view-header"><h2>Gestión de Usuarios</h2><button class="btn-primary" onclick="abrirModalUsuario()">Crear usuario</button></header>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th>ID</th><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Activo</th><th>Acciones</th></tr></thead>
+                        <tbody id="usuarios-tbody"></tbody>
                     </table>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Invoice Modal -->
     <div class="modal-overlay" id="invoice-modal">
-        <div class="modal-content invoice-card">
+        <div class="modal-content">
             <button class="close-modal" id="close-invoice"><i class="fa-solid fa-xmark"></i></button>
-<div class="invoice-header">
-    <div class="invoice-logo-img">
-        <img src="Imagenes/Logo.jpg" alt="Logo El Filete">
-    </div>
-    <h2>Restaurante "El Filete"</h2>
-    <p>Factura de Venta</p>
-    <p class="invoice-meta">Fecha: <span id="inv-date"></span> | Hora: <span id="inv-time"></span></p>
-    <p class="invoice-meta">Cliente: <strong id="inv-cliente">Consumidor Final</strong> | <span id="inv-mesa">Para Llevar</span></p>
-    <p class="invoice-meta">Comprobante N°: <span id="inv-number" class="highlight">000001</span></p>
-</div>            <div class="invoice-body">
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th>Cant.</th>
-                            <th>Descripción</th>
-                            <th>P. Unit</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inv-items"></tbody>
-                </table>
+            <div class="invoice-header">
+                <h2>Restaurante El Filete</h2>
+                <p>Comprobante N°: <span id="inv-number"></span></p>
+                <p>Fecha: <span id="inv-date"></span> | Hora: <span id="inv-time"></span></p>
+                <p>Cliente: <strong id="inv-cliente"></strong> | <span id="inv-mesa"></span></p>
             </div>
-
-            <div class="invoice-footer">
-                <div class="inv-summary">
-                    <div class="inv-row"><span>Subtotal:</span><span id="inv-subtotal"></span></div>
-                    <div class="inv-row"><span>IVA (15%):</span><span id="inv-tax"></span></div>
-                    <div class="inv-row inv-total"><span>Total pagado:</span><span id="inv-total"></span></div>
-                </div>
-                <div class="inv-payment-info">
-                    <p>Método de pago: <span id="inv-payment-method" class="highlight-badge">Efectivo</span></p>
-                </div>
-                <p class="thank-you">¡Gracias por su preferencia!</p>
+            <table class="invoice-table">
+                <thead><tr><th>Cant.</th><th>Descripción</th><th>P. Unit</th><th>Total</th></tr></thead>
+                <tbody id="inv-items"></tbody>
+            </table>
+            <div class="inv-summary">
+                <div class="inv-row"><span>Subtotal:</span><span id="inv-subtotal"></span></div>
+                <div class="inv-row"><span>IVA (15%):</span><span id="inv-tax"></span></div>
+                <div class="inv-row inv-total"><span>Total:</span><span id="inv-total"></span></div>
             </div>
             <div class="modal-actions">
                 <button class="btn-secondary" id="btn-print"><i class="fa-solid fa-print"></i> Imprimir</button>
@@ -195,47 +123,43 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
+    <div class="modal-overlay" id="user-modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="cerrarModalUsuario()"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom:1.5rem;">Crear Usuario</h2>
+            <form id="user-form">
+                <div class="form-group"><label>Usuario</label><input type="text" id="new-username" class="order-input" required></div>
+                <div class="form-group" style="margin-top:1rem;"><label>Nombre</label><input type="text" id="new-nombre" class="order-input" required></div>
+                <div class="form-group" style="margin-top:1rem;"><label>Contraseña</label><input type="password" id="new-password" class="order-input" required minlength="8"></div>
+                <div class="form-group" style="margin-top:1rem;"><label>Rol</label><select id="new-rol" class="order-select"><option value="mesero">Mesero</option><option value="cajero">Cajero</option><option value="admin">Admin</option></select></div>
+                <div id="user-error" style="color:var(--danger); font-size:0.8rem; margin-top:0.5rem; display:none;"></div>
+                <button type="submit" class="btn-primary" style="width:100%; margin-top:1.5rem;">Guardar</button>
+            </form>
+        </div>
+    </div>
+
     <div id="toast-container" class="toast-container"></div>
 
     <script>
-        /* ====== GESTIÓN DE TEMA ====== */
         function aplicarTema(tema) {
             document.documentElement.setAttribute('data-theme', tema);
             const icono = document.getElementById('icono-tema');
-            const texto = document.getElementById('texto-tema');
-            if (icono) {
-                icono.className = tema === 'light' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-            }
-            if (texto) {
-                texto.textContent = tema === 'light' ? 'Claro' : 'Oscuro';
-            }
+            if (icono) icono.className = tema === 'light' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
             localStorage.setItem('filete-tema', tema);
         }
-
         function toggleTema() {
             const actual = document.documentElement.getAttribute('data-theme');
             aplicarTema(actual === 'dark' ? 'light' : 'dark');
         }
-
-        (function initTema() {
-            const guardado = localStorage.getItem('filete-tema');
-            if (guardado) {
-                aplicarTema(guardado);
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-                aplicarTema('light');
-            } else {
-                aplicarTema('dark');
-            }
+        (function() {
+            const actual = document.documentElement.getAttribute('data-theme');
+            const icono = document.getElementById('icono-tema');
+            if (icono) icono.className = actual === 'light' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         })();
-
-        // Sincronizar tema entre pestañas/iframes
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'filete-tema' && e.newValue) {
-                aplicarTema(e.newValue);
-            }
-        });
     </script>
+
+    <script src="login.js"></script>
     <script src="app.js"></script>
+    <script src="usuarios.js"></script>
 </body>
 </html>

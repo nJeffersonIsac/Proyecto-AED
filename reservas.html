@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservas - El Filete</title>
+    <link rel="stylesheet" href="Facturacion.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        (function initTema() {
+            const guardado = localStorage.getItem('filete-tema');
+            if (guardado) document.documentElement.setAttribute('data-theme', guardado);
+        })();
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <main class="main-content" style="padding: 2rem; overflow-y: auto;">
+            <header class="view-header">
+                <h2>Gestión de Reservas</h2>
+                <!-- ID AGREGADO AQUI -->
+                <button class="btn-primary" id="btn-nueva-reserva" onclick="abrirModalReserva()"><i class="fa-solid fa-plus"></i> Nueva Reserva</button>
+            </header>
+
+            <div style="display:flex; gap:1rem; margin-bottom:2rem;">
+                <input type="date" id="filtro-fecha" class="order-input" style="max-width:200px;">
+                <select id="filtro-estado" class="order-select" style="max-width:200px;">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="confirmada">Confirmada</option>
+                    <option value="completada">Completada</option>
+                    <option value="cancelada">Cancelada</option>
+                </select>
+                <button class="btn-primary" onclick="cargarReservas()">Filtrar</button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead><tr><th>Fecha</th><th>Hora</th><th>Cliente</th><th>Personas</th><th>Mesa</th><th>Estado</th><th>Acciones</th></tr></thead>
+                    <tbody id="reservas-tbody"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Reserva -->
+    <div class="modal-overlay" id="reserva-modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="cerrarModalReserva()"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom:1.5rem;">Nueva Reserva</h2>
+            <form id="reserva-form">
+                <div class="order-config-row" style="margin-bottom:1rem;"><label>Cliente:</label><input type="text" id="res-nombre" class="order-input" required></div>
+                <div class="order-config-row" style="margin-bottom:1rem;"><label>Teléfono:</label><input type="tel" id="res-telefono" class="order-input" required></div>
+                <div class="order-config-row" style="margin-bottom:1rem;"><label>Fecha:</label><input type="date" id="res-fecha" class="order-input" required></div>
+                <div class="order-config-row" style="margin-bottom:1rem;"><label>Hora:</label><input type="time" id="res-hora" class="order-input" min="12:00" max="22:00" required></div>
+                <div class="order-config-row" style="margin-bottom:1rem;"><label>Personas:</label><input type="number" id="res-personas" class="order-input" min="1" max="20" required></div>
+                <div class="order-config-row" style="margin-bottom:1rem;"><label>Mesa:</label><select id="res-mesa" class="order-select"><option value="">Sin asignar</option></select></div>
+                <div class="order-config-row" style="margin-bottom:1rem;"><label>Notas:</label><input type="text" id="res-notas" class="order-input"></div>
+                <div id="reserva-error" style="color:var(--danger); font-size:0.8rem; margin-bottom:1rem; display:none;"></div>
+                <button type="submit" class="btn-primary" style="width:100%;">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="login.js"></script>
+    <script src="reservas.js"></script>
+</body>
+</html>

@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú del Restaurante </title>
+    <title>Menú del Restaurante</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="menu.css">
+    <script>
+        (function initTema() {
+            const guardado = localStorage.getItem('filete-tema');
+            if (guardado) document.documentElement.setAttribute('data-theme', guardado);
+        })();
+    </script>
 </head>
 <body>
     <button class="btn-tema" id="btn-tema" onclick="toggleTema()" title="Cambiar tema">
@@ -16,7 +22,8 @@
 
     <div class="contenedor">
         <header class="cabecera-menu">
-            <div class="logo-box">
+            <!-- 🔥 TRUCO DE ACCESO: Doble clic en el logo -->
+            <div class="logo-box" title="Menú El Filete" ondblclick="window.location.href='login.html'" style="cursor: pointer;">
                 <img src="Imagenes/Logo.jpg" alt="Logo El Filete">
             </div>
             <h1>Menú Digital</h1>
@@ -33,18 +40,12 @@
     <script>
         const API_BASE = (window.location.protocol === 'file:') ? 'http://localhost:5000' : '';
 
-        /* ====== GESTIÓN DE TEMA ====== */
         function aplicarTema(tema) {
             document.documentElement.setAttribute('data-theme', tema);
             const icono = document.getElementById('icono-tema');
             const texto = document.getElementById('texto-tema');
-            if (tema === 'light') {
-                icono.className = 'fa-solid fa-sun';
-                texto.textContent = 'Claro';
-            } else {
-                icono.className = 'fa-solid fa-moon';
-                texto.textContent = 'Oscuro';
-            }
+            if (icono) icono.className = tema === 'light' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            if (texto) texto.textContent = tema === 'light' ? 'Claro' : 'Oscuro';
             localStorage.setItem('filete-tema', tema);
         }
 
@@ -53,88 +54,54 @@
             aplicarTema(actual === 'dark' ? 'light' : 'dark');
         }
 
-        (function initTema() {
-            const guardado = localStorage.getItem('filete-tema');
-            if (guardado) {
-                aplicarTema(guardado);
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-                aplicarTema('light');
-            } else {
-                aplicarTema('dark');
-            }
+        (function() {
+            const actual = document.documentElement.getAttribute('data-theme');
+            aplicarTema(actual);
         })();
 
         window.addEventListener('storage', (e) => {
-            if (e.key === 'filete-tema' && e.newValue) {
-                aplicarTema(e.newValue);
-            }
+            if (e.key === 'filete-tema' && e.newValue) aplicarTema(e.newValue);
         });
 
-        /* ====== ACORDEÓN ====== */
-        function toggleCategoria(elementoTitulo) {
-            const seccion = elementoTitulo.closest('.seccion-categoria');
-            seccion.classList.toggle('abierta');
-        }
+        function toggleCategoria(el) { el.closest('.seccion-categoria').classList.toggle('abierta'); }
 
-        /* ====== CARGA DEL MENÚ ====== */
         async function cargarMenu() {
             const container = document.getElementById('menu-contenedor');
             try {
                 const res = await fetch(`${API_BASE}/api/productos`);
-                if (!res.ok) throw new Error("Error al consultar productos (HTTP " + res.status + ")");
+                if (!res.ok) throw new Error("Error al consultar productos");
                 const productos = await res.json();
-
-                const categoriasMap = new Map();
-                productos.forEach(p => {
-                    if (!categoriasMap.has(p.categoria)) {
-                        categoriasMap.set(p.categoria, []);
-                    }
-                    categoriasMap.get(p.categoria).push(p);
-                });
-
-                let html = '';
-                let primeraCategoria = true;
-
-                categoriasMap.forEach((items, categoria) => {
-                    const abierta = primeraCategoria ? 'abierta' : '';
-                    primeraCategoria = false;
-
+                const map = new Map();
+                productos.forEach(p => { if (!map.has(p.categoria)) map.set(p.categoria, []); map.get(p.categoria).push(p); });
+                
+                let html = ''; let primera = true;
+                map.forEach((items, categoria) => {
                     html += `
-                    <section class="seccion-categoria ${abierta}">
+                    <section class="seccion-categoria ${primera ? 'abierta' : ''}">
                         <h2 class="titulo-categoria" onclick="toggleCategoria(this)">
-                            <span class="titulo-izq">
-                                <i class="fa-solid fa-utensils"></i>
-                                ${categoria}
-                                <span class="badge-contador">${items.length}</span>
-                            </span>
+                            <span class="titulo-izq"><i class="fa-solid fa-utensils"></i> ${categoria} <span class="badge-contador">${items.length}</span></span>
                             <i class="fa-solid fa-chevron-down chevron"></i>
                         </h2>
-                        <div class="contenido-categoria">
-                            <div class="cuadricula">
-                                ${items.map(p => `
-                                    <article class="tarjeta-producto">
-                                        <div class="imagen-wrapper">
-                                            ${p.imagen_url
-                                                ? `<img src="${p.imagen_url}" alt="${p.nombre}" class="imagen-producto" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-utensils icono-placeholder\\'></i>'">`
-                                                : `<i class="fa-solid fa-utensils icono-placeholder"></i>`}
-                                        </div>
-                                        <div class="contenido-tarjeta">
-                                            <h3 class="nombre-producto">${p.nombre}</h3>
-                                            <p class="descripcion-producto">${p.descripcion || ''}</p>
-                                            <span class="precio">C$ ${p.precio.toFixed(2)}</span>
-                                        </div>
-                                    </article>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </section>
-                    `;
+                        <div class="contenido-categoria"><div class="cuadricula">
+                            ${items.map(p => `
+                                <article class="tarjeta-producto">
+                                    <div class="imagen-wrapper">
+                                        ${p.imagen_url ? `<img src="${p.imagen_url}" class="imagen-producto" onerror="this.onerror=null; this.src='Imagenes/Logo.jpg';">` : '<i class="fa-solid fa-utensils icono-placeholder"></i>'}
+                                    </div>
+                                    <div class="contenido-tarjeta">
+                                        <h3 class="nombre-producto">${p.nombre}</h3>
+                                        <p class="descripcion-producto">${p.descripcion || ''}</p>
+                                        <span class="precio">C$ ${p.precio.toFixed(2)}</span>
+                                    </div>
+                                </article>
+                            `).join('')}
+                        </div></div>
+                    </section>`;
+                    primera = false;
                 });
-
                 container.innerHTML = html;
-            } catch (err) {
-                console.error("Error cargando el menú:", err);
-                container.innerHTML = `<div class="loading-state" style="color:#ef4444;">Error al cargar el menú desde el servidor.</div>`;
+            } catch (err) { 
+                container.innerHTML = '<div class="loading-state" style="color:#ef4444;">Error al cargar el menú.</div>'; 
             }
         }
 
